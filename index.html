@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Автономный БПЛА</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="hero-page">
+
+    <div class="hero-wrapper">
+
+        <img class="hero-image"
+             src="{{ url_for('static', filename='images/hero.jpg') }}"
+             alt="Автономный БПЛА">
+
+        <a href="/device"    class="hero-btn hero-btn-1"></a>
+        <a href="/tutorial"  class="hero-btn hero-btn-2"></a>
+        <a href="/simulator" class="hero-btn hero-btn-3"></a>
+
+    </div>
+
+</body>
+</html>

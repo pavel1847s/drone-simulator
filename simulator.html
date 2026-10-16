@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Симулятор</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="sim-page">
+
+<header>
+    <a href="/" class="logo">Автономный БПЛА</a>
+    <div class="status"><span class="dot"></span>СИСТЕМА В СЕТИ</div>
+</header>
+
+<main>
+<section class="scene">
+    <div class="scene-title">СИМУЛЯЦИЯ АВТОНОМНОЙ НАВИГАЦИИ</div>
+
+    <div class="city" id="city">
+        <div class="point point-a" id="point-a">A</div>
+        <div class="point point-b" id="point-b">B</div>
+
+        <img id="drone" class="drone"
+             data-front="{{ url_for('static', filename='images/drone-front.jpg') }}"
+             data-back="{{ url_for('static', filename='images/drone-back.jpg') }}"
+             data-left="{{ url_for('static', filename='images/drone-left.jpg') }}"
+             data-right="{{ url_for('static', filename='images/drone-right.jpg') }}"
+             src="{{ url_for('static', filename='images/drone-back.jpg') }}">
+    </div>
+
+    <div class="win-message" id="win-message">ВЫ ДОСТИГЛИ МЕСТА НАЗНАЧЕНИЯ</div>
+</section>
+
+<aside>
+    <h2>Управление</h2>
+    <div class="parameter"><span>W / ↑</span><strong>Вперёд</strong></div>
+    <div class="parameter"><span>S / ↓</span><strong>Назад</strong></div>
+    <div class="parameter"><span>A / ←</span><strong>Влево</strong></div>
+    <div class="parameter"><span>D / →</span><strong>Вправо</strong></div>
+    <div class="parameter"><span>Пробел</span><strong>Взлёт / Посадка</strong></div>
+    <div class="parameter"><span>R</span><strong>Новая игра</strong></div>
+
+    <div class="parameter"><span>До точки B</span><strong id="distance">—</strong></div>
+    <div class="parameter"><span>Статус</span><strong id="flight-status">НА ЗЕМЛЕ</strong></div>
+
+    <button id="restart-button">НОВАЯ ИГРА</button>
+</aside>
+</main>
+
+<script src="{{ url_for('static', filename='simulator.js') }}"></script>
+</body>
+</html>

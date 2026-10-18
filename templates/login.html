@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Вход</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .auth-box { width: 320px; margin: 80px auto; background: #181a1d; padding: 30px; border-radius: 12px; border: 1px solid #333; }
+        .auth-box input { width: 100%; padding: 12px; margin: 8px 0; background: #111; border: 1px solid #555; color: white; box-sizing: border-box; border-radius: 6px;}
+        .auth-box button { width: 100%; padding: 12px; background: #55d66b; color: #000; border: none; font-weight: bold; cursor: pointer; margin-top: 15px; border-radius: 6px;}
+        .msg { color: #ff5555; font-size: 14px; margin-bottom: 10px; text-align: center;}
+        .success { color: #55d66b; }
+        .links { text-align: center; margin-top: 15px; font-size: 14px; }
+        .links a { color: #888; text-decoration: none; display: block; margin-top: 5px;}
+        .links a:hover { color: #55d66b; }
+    </style>
+</head>
+<body>
+    <div class="auth-box">
+        <h2 style="text-align: center; margin-top: 0;">Вход</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="msg {% if category == 'success' %}success{% endif %}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        <form method="POST">
+            <input type="email" name="email" placeholder="Электронная почта" required>
+            <input type="password" name="password" placeholder="Пароль" required>
+            <button type="submit">Войти</button>
+        </form>
+        <div class="links">
+            <a href="/register">Нет аккаунта? Регистрация</a>
+            <a href="/" style="margin-top: 15px; color: #55d66b;">← На главную</a>
+        </div>
+    </div>
+</body>
+</html>

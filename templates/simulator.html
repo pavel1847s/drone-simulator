@@ -33,10 +33,29 @@
         <div class="win-message" id="win-message">
             ВЫ ДОСТИГЛИ МЕСТА НАЗНАЧЕНИЯ
         </div>
+
+        <!-- ВОТ ЭТОТ БЛОК МЫ ДОБАВИЛИ (ЭКРАН ВЗРЫВА) -->
+        <div class="explosion-overlay" id="explosion-overlay">
+            <h1 class="explosion-text">ДРОН БЫЛ ВЗОРВАН!</h1>
+            <a href="/search" class="btn-restart">НАЙТИ НОВОГО ДРОНА</a>
+        </div>
+        <!-- КОНЕЦ БЛОКА -->
+        
     </section>
 
     <aside>
         <h2>Управление</h2>
+        
+        <!-- Добавим сюда серийный номер и заряд -->
+        <div class="parameter" style="background: rgba(85, 214, 107, 0.1); border: 1px solid #55d66b;">
+            <span>Дрон №</span>
+            <strong id="drone-serial-display">...</strong>
+        </div>
+        <div class="parameter" style="background: rgba(85, 214, 107, 0.1); border: 1px solid #55d66b;">
+            <span>Заряд</span>
+            <strong id="drone-battery-display">...</strong>
+        </div>
+
         <div class="parameter"><span>W / ↑</span><strong>Вперёд</strong></div>
         <div class="parameter"><span>S / ↓</span><strong>Назад</strong></div>
         <div class="parameter"><span>A / ←</span><strong>Влево</strong></div>

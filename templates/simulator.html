@@ -17,6 +17,13 @@
     <section class="scene">
         <div class="scene-title">СИМУЛЯЦИЯ АВТОНОМНОЙ НАВИГАЦИИ</div>
 
+        <!-- МИНИ-ПАНЕЛЬ ДЛЯ ТЕЛЕФОНА -->
+        <div class="mobile-hud">
+            <div class="hud-item">Таймер <strong id="mob-timer">01:00</strong></div>
+            <div class="hud-item">Заряд <strong id="mob-battery">...</strong></div>
+            <div class="hud-item">Грузы <strong id="mob-cargo">0/3</strong></div>
+        </div>
+
         <div class="city" id="city">
             <div class="point point-a" id="point-a">A</div>
             <div class="point point-b" id="point-b">B</div>
@@ -34,18 +41,15 @@
             ВЫ ДОСТИГЛИ МЕСТА НАЗНАЧЕНИЯ
         </div>
 
-        <!-- Экран взрыва -->
         <div class="explosion-overlay" id="explosion-overlay">
             <h1 class="explosion-text" id="explosion-text">ДРОН БЫЛ ВЗОРВАН!</h1>
             <a href="/search" class="btn-restart">НАЙТИ НОВОГО ДРОНА</a>
         </div>
-        
     </section>
 
     <aside>
         <h2>Управление</h2>
         
-        <!-- Применяем новые мягкие стили -->
         <div class="parameter param-green">
             <span>Дрон №</span>
             <strong id="drone-serial-display">...</strong>
@@ -54,14 +58,10 @@
             <span>Заряд</span>
             <strong id="drone-battery-display">...</strong>
         </div>
-
-        <!-- БЛОК ТАЙМЕРА -->
         <div class="parameter param-red">
             <span>Таймер</span>
             <strong id="timer-display">01:00</strong>
         </div>
-
-        <!-- БЛОК ГРУЗОВ -->
         <div class="parameter param-orange">
             <span>Грузы</span>
             <strong id="cargo-display">0 / 3</strong>
@@ -74,7 +74,6 @@
         <div class="parameter"><span>Пробел</span><strong>Взлёт / Посадка</strong></div>
         <div class="parameter"><span>E</span><strong>Собрать груз</strong></div>
         <div class="parameter"><span>R</span><strong>Новая игра</strong></div>
-
         <div class="parameter">
             <span>До точки B</span>
             <strong id="distance">—</strong>

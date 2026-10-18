@@ -1,12 +1,5 @@
 // ===== НАСТРОЙКИ =====
-const COLS = 5;
-const ROWS = 4;
-const CELL_W = 100 / COLS;
-const CELL_H = 100 / ROWS;
-const HOUSE_W = 12;
-const HOUSE_H = 14;
-const HOUSE_CHANCE = 0.6;
-const DRONE_RADIUS = 3;
+const DRONE_RADIUS = 2.5;   // Сделали чуть меньше, чтобы легче пролетал в узких местах
 const DRONE_SPEED = 30;
 const WIN_DISTANCE = 4;
 
@@ -20,12 +13,10 @@ const statusEl = document.getElementById("flight-status");
 const restartBtn = document.getElementById("restart-button");
 const explosionOverlay = document.getElementById("explosion-overlay");
 
-// Читаем номер и заряд дрона из ссылки, по которой пришел пользователь
 const urlParams = new URLSearchParams(window.location.search);
 const droneSerial = urlParams.get('serial') || '12345';
 const droneBattery = urlParams.get('battery') || '75';
 
-// Выводим их в панель справа
 const serialDisplay = document.getElementById("drone-serial-display");
 const batteryDisplay = document.getElementById("drone-battery-display");
 if (serialDisplay) serialDisplay.textContent = droneSerial;
@@ -47,53 +38,28 @@ const houseImages = [
 let houses = [];
 let dronePos = { x: 0, y: 0 };
 let targetPos = { x: 0, y: 0 };
+let startPos = { x: 0, y: 0 };
 let flying = false;
 let won = false;
 const keys = {};
 
 const rand = (a, b) => a + Math.random() * (b - a);
 
-// ===== ГЕНЕРАЦИЯ ДОМОВ =====
-function generateHouses() {
-    houses = [];
-    const freeRow = Math.floor(Math.random() * ROWS);
-    const freeCol = Math.floor(Math.random() * COLS);
-
-    for (let r = 0; r < ROWS; r++) {
-        for (let c = 0; c < COLS; c++) {
-            if (r === freeRow || c === freeCol) continue;
-            if (Math.random() > HOUSE_CHANCE) continue;
-
-            const cx = c * CELL_W + CELL_W / 2;
-            const cy = r * CELL_H + CELL_H / 2;
-            houses.push({
-                x: cx - HOUSE_W / 2,
-                y: cy - HOUSE_H / 2,
-                w: HOUSE_W,
-                h: HOUSE_H
-            });
-        }
-    }
-}
-
-// ===== ПРОВЕРКА СВОБОДНОГО МЕСТА =====
+// ===== ПРОВЕРКА СТОЛКНОВЕНИЙ =====
 function pointFree(x, y) {
     const m = DRONE_RADIUS;
     if (x - m < 0 || x + m > 100) return false;
     if (y - m < 0 || y + m > 100) return false;
 
-    // Отступы, чтобы дрон подлетал ближе к видимым стенам (игнорируем прозрачный фон PNG)
-    const PAD_X = 2.5; // отступ слева и справа
-    const PAD_Y = 4.5; // отступ сверху и снизу
+    const PAD_X = 3.5; // Отступ сбоку
+    const PAD_Y = 3;   // Отступ сверху/снизу
 
     for (const h of houses) {
-        // Проверяем столкновение с уменьшенным хитбоксом
         if (x + m > h.x + PAD_X && x - m < h.x + h.w - PAD_X &&
             y + m > h.y + PAD_Y && y - m < h.y + h.h - PAD_Y) return false;
     }
     return true;
 }
-
 
 function findFreePoint() {
     for (let i = 0; i < 500; i++) {
@@ -104,11 +70,95 @@ function findFreePoint() {
 }
 
 function findTargetFarFrom(start) {
-    for (let i = 0; i < 800; i++) {
+    for (let i = 0; i < 100; i++) {
         const p = findFreePoint();
-        if (Math.hypot(p.x - start.x, p.y - start.y) > 40) return p;
+        if (Math.hypot(p.x - start.x, p.y - start.y) > 35) return p;
     }
     return findFreePoint();
+}
+
+// ===== ПРОВЕРКА ПУТИ (АЛГОРИТМ BFS) =====
+function checkPath(start, end) {
+    const step = 2; // Проверяем каждые 2%
+    const visited = new Set();
+    const queue = [{ x: start.x, y: start.y }];
+    visited.add(`${Math.floor(start.x/step)},${Math.floor(start.y/step)}`);
+    
+    const endX = Math.floor(end.x/step);
+    const endY = Math.floor(end.y/step);
+    const dirs = [[1,0], [-1,0], [0,1], [0,-1]];
+    
+    while (queue.length > 0) {
+        const p = queue.shift();
+        const px = Math.floor(p.x/step);
+        const py = Math.floor(p.y/step);
+        
+        // Если дрон добрался до цели (или очень близко)
+        if (Math.abs(px - endX) <= 2 && Math.abs(py - endY) <= 2) return true;
+        
+        for (const [dx, dy] of dirs) {
+            const nx = px + dx;
+            const ny = py + dy;
+            const key = `${nx},${ny}`;
+            
+            if (!visited.has(key)) {
+                const realX = nx * step + step/2;
+                const realY = ny * step + step/2;
+                
+                if (realX > 0 && realX < 100 && realY > 0 && realY < 100) {
+                    if (pointFree(realX, realY)) {
+                        visited.add(key);
+                        queue.push({ x: realX, y: realY });
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+
+// ===== ГЕНЕРАЦИЯ ДОМОВ =====
+function generateHouses() {
+    let attempts = 0;
+    
+    // Пытаемся сгенерировать карту до 100 раз
+    while (attempts < 100) {
+        attempts++;
+        houses = [];
+        
+        // 1. Генерируем кластеры домов
+        const numSeeds = 12 + Math.floor(Math.random() * 6); // 12-18 кластеров (плотнее)
+        for (let i = 0; i < numSeeds; i++) {
+            const cx = rand(15, 85);
+            const cy = rand(15, 85);
+            const count = 1 + Math.floor(Math.random() * 3); // 1-3 дома в куче
+            
+            for (let j = 0; j < count; j++) {
+                const w = rand(8, 14);
+                const h = rand(10, 16);
+                // Разбрасываем дома внутри кластера, чтобы они иногда были вплотную
+                const x = Math.max(2, Math.min(98 - w, cx + rand(-6, 6) - w/2));
+                const y = Math.max(2, Math.min(98 - h, cy + rand(-6, 6) - h/2));
+                houses.push({ x, y, w, h });
+            }
+        }
+        
+        // 2. Ищем стартовые точки
+        dronePos = findFreePoint();
+        targetPos = findTargetFarFrom(dronePos);
+        
+        // 3. Проверяем, можно ли долететь
+        if (checkPath(dronePos, targetPos)) {
+            startPos = { x: dronePos.x, y: dronePos.y };
+            return; // Путь есть! Оставляем эту карту.
+        }
+    }
+    
+    // Запасной вариант (если вообще не смогли)
+    houses = [];
+    dronePos = { x: 10, y: 10 };
+    startPos = { x: 10, y: 10 };
+    targetPos = { x: 90, y: 90 };
 }
 
 // ===== ОТРИСОВКА ДОМОВ =====
@@ -145,13 +195,11 @@ function update(dt) {
     const nx = dronePos.x + dx * step;
     const ny = dronePos.y + dy * step;
 
-    // НОВАЯ ЛОГИКА: Если врезаемся в дом, вызываем взрыв
     if (!pointFree(nx, ny)) {
         triggerExplosion();
         return;
     }
 
-    // Если свободно - двигаемся
     dronePos.x = nx;
     dronePos.y = ny;
 
@@ -185,7 +233,6 @@ function checkWin() {
     }
 }
 
-// ===== ФУНКЦИЯ ВЗРЫВА =====
 function triggerExplosion() {
     won = true;
     flying = false;
@@ -200,23 +247,37 @@ function newGame() {
     won = false;
     flying = false;
     winMessage.classList.remove("visible");
-    // Скрываем экран взрыва при перезапуске
     if (explosionOverlay) explosionOverlay.classList.remove("visible");
     statusEl.textContent = "НА ЗЕМЛЕ";
 
     generateHouses();
     renderHouses();
 
-    dronePos = findFreePoint();
-    targetPos = findTargetFarFrom(dronePos);
-
-    pointA.style.left = dronePos.x + "%";
-    pointA.style.top = dronePos.y + "%";
+    pointA.style.left = startPos.x + "%";
+    pointA.style.top = startPos.y + "%";
     pointB.style.left = targetPos.x + "%";
     pointB.style.top = targetPos.y + "%";
 
+    dronePos = { x: startPos.x, y: startPos.y };
     updateDronePosition();
     drone.src = droneImages.back;
+    drone.style.transform = "translate(-50%, -50%) scale(0.85)";
+}
+
+// ===== СБРОС ДРОНА НА СТАРТ (Клавиша R) =====
+function resetToStart() {
+    if (won || flying) {
+        won = false;
+        flying = false;
+        if (explosionOverlay) explosionOverlay.classList.remove("visible");
+        winMessage.classList.remove("visible");
+        statusEl.textContent = "НА ЗЕМЛЕ";
+        
+        dronePos = { x: startPos.x, y: startPos.y };
+        updateDronePosition();
+        drone.src = droneImages.back;
+        drone.style.transform = "translate(-50%, -50%) scale(0.85)";
+    }
 }
 
 // ===== ПРОБЕЛ: ВЗЛЁТ/ПОСАДКА =====
@@ -233,7 +294,7 @@ function toggleFlight() {
 document.addEventListener("keydown", e => {
     keys[e.code] = true;
 
-    if (e.code === "KeyR") newGame();
+    if (e.code === "KeyR") resetToStart();
     if (e.code === "Space") toggleFlight();
 
     if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"].includes(e.code)) {

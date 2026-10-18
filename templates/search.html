@@ -142,5 +142,17 @@
     // Запускаем поиск при загрузке страницы
     startSearch();
 </script>
+    <script>
+    // Загружаем статистику с сервера
+    fetch('/api/stats')
+        .then(response => response.json())
+        .then(data => {
+            // Создаем красивую плашку со статистикой
+            const statsDiv = document.createElement('div');
+            statsDiv.style.cssText = 'position: absolute; bottom: 20px; left: 20px; color: #888; font-size: 14px; background: #181a1d; padding: 10px 20px; border-radius: 8px; border: 1px solid #303030;';
+            statsDiv.innerHTML = `📊 <b>Статистика сервера:</b> &nbsp; ✅ Успешных миссий: <span style="color: #55d66b;">${data.wins}</span> &nbsp; | &nbsp; 💥 Дронов потеряно: <span style="color: #d87528;">${data.losses}</span>`;
+            document.body.appendChild(statsDiv);
+        });
+</script>
 </body>
 </html>

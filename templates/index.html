@@ -6,7 +6,7 @@
     <title>Автономный БПЛА</title>
     <link rel="stylesheet" href="/static/style.css">
     <style>
-        /* Стили для кнопок входа (чтобы они были поверх картинки) */
+        /* Стили для кнопок входа (справа сверху, видны только гостям) */
         .auth-buttons {
             position: absolute;
             top: 20px;
@@ -17,7 +17,7 @@
             align-items: center;
             font-family: Arial, sans-serif;
         }
-        .auth-buttons a, .auth-buttons span {
+        .auth-buttons a {
             font-size: 14px;
             text-decoration: none;
             padding: 8px 16px;
@@ -37,47 +37,53 @@
         }
         .btn-register:hover { background: #45b558; }
         
-        .btn-logout {
-            color: #ff5555;
-            border: 1px solid #ff5555;
-        }
-        .btn-logout:hover { background: rgba(255, 85, 85, 0.2); }
-        
-        .username-display {
-            color: #55d66b;
-            font-weight: bold;
-            margin-right: 10px;
-        }
-        
-        /* Стили для юзернейма внизу по центру */
-        .bottom-username {
+        /* Стили для плашки внизу по центру */
+        .bottom-user-panel {
             position: absolute;
             bottom: 20px;
             width: 100%;
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
             z-index: 100;
-            pointer-events: none;
+            pointer-events: none; /* Клики проходят сквозь пустую область */
         }
-        .bottom-username span {
-            color: rgba(255,255,255,0.7);
+        
+        .bottom-username {
+            color: rgba(255,255,255,0.8);
             font-family: Arial, sans-serif;
-            font-size: 16px;
-            letter-spacing: 2px;
-            background: rgba(0,0,0,0.6);
-            padding: 6px 20px;
+            font-size: 15px;
+            letter-spacing: 1px;
+            background: rgba(0,0,0,0.7);
+            padding: 8px 20px;
             border-radius: 20px;
             border: 1px solid #333;
+        }
+        
+        .btn-logout-bottom {
+            color: #ff5555;
+            text-decoration: none;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: 1px solid #ff5555;
+            background: rgba(0,0,0,0.7);
+            transition: 0.2s;
+            pointer-events: auto; /* Возвращаем кликабельность кнопке */
+        }
+        .btn-logout-bottom:hover {
+            background: rgba(255, 85, 85, 0.2);
+            color: #fff;
         }
     </style>
 </head>
 <body class="hero-page">
 
-    <!-- Кнопки аккаунта (справа сверху) -->
+    <!-- Кнопки аккаунта (справа сверху, показываются ТОЛЬКО если не вошел) -->
     <div class="auth-buttons">
-        {% if session.username %}
-            <span class="username-display">👤 {{ session.username }}</span>
-            <a href="/logout" class="btn-logout">Выйти</a>
-        {% else %}
+        {% if not session.username %}
             <a href="/login" class="btn-login">Войти</a>
             <a href="/register" class="btn-register">Регистрация</a>
         {% endif %}
@@ -91,10 +97,13 @@
         <a href="/search" class="hero-btn hero-btn-3"></a> <!-- Ведет на поиск дрона -->
     </div>
 
-    <!-- Юзернейм внизу по центру -->
+    <!-- Юзернейм и кнопка выхода внизу по центру (показываются ТОЛЬКО если вошел) -->
     {% if session.username %}
-    <div class="bottom-username">
-        <span>👤 Вы вошли как: <strong style="color: #55d66b;">{{ session.username }}</strong></span>
+    <div class="bottom-user-panel">
+        <span class="bottom-username">
+            👤 Вы вошли как: <strong style="color: #55d66b;">{{ session.username }}</strong>
+        </span>
+        <a href="/logout" class="btn-logout-bottom">Выйти</a>
     </div>
     {% endif %}
 

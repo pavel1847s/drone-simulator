@@ -5,8 +5,27 @@
     <title>Регистрация</title>
     <link rel="stylesheet" href="/static/style.css">
     <style>
-        .auth-box { width: 320px; margin: 80px auto; background: #181a1d; padding: 30px; border-radius: 12px; border: 1px solid #333; }
+        .auth-box { width: 320px; margin: 80px auto; background: #181a1d; padding: 30px; border-radius: 12px; border: 1px solid #333; font-family: Arial, sans-serif;}
+        
+        /* Общие стили для полей */
         .auth-box input { width: 100%; padding: 12px; margin: 8px 0; background: #111; border: 1px solid #555; color: white; box-sizing: border-box; border-radius: 6px;}
+        
+        /* Стили для поля с паролем и глазиком */
+        .password-container { position: relative; width: 100%; }
+        .password-container input { padding-right: 40px; /* Оставляем место для глазика */ }
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 18px;
+            opacity: 0.6;
+            transition: 0.2s;
+            user-select: none;
+        }
+        .toggle-password:hover { opacity: 1; }
+
         .auth-box button { width: 100%; padding: 12px; background: #55d66b; color: #000; border: none; font-weight: bold; cursor: pointer; margin-top: 15px; border-radius: 6px;}
         .msg { color: #ff5555; font-size: 14px; margin-bottom: 10px; text-align: center;}
         .success { color: #55d66b; }
@@ -28,7 +47,13 @@
         <form method="POST">
             <input type="text" name="username" placeholder="Имя пользователя" required>
             <input type="email" name="email" placeholder="Электронная почта" required>
-            <input type="password" name="password" placeholder="Пароль" required>
+            
+            <!-- Поле пароля с глазиком -->
+            <div class="password-container">
+                <input type="password" name="password" id="reg-password" placeholder="Пароль" required>
+                <span class="toggle-password" onclick="togglePassword('reg-password', this)">👁️</span>
+            </div>
+
             <button type="submit">Создать аккаунт</button>
         </form>
         <div class="links">
@@ -36,5 +61,19 @@
             <a href="/" style="margin-top: 15px; color: #55d66b;">← На главную</a>
         </div>
     </div>
+
+    <script>
+        function togglePassword(inputId, icon) {
+            const input = document.getElementById(inputId);
+            if (input.type === "password") {
+                input.type = "text";
+                icon.textContent = "🙈"; // Закрытый глазик (обезьянка)
+            } else {
+                input.type = "password";
+                icon.textContent = "👁️"; // Открытый глазик
+            }
+        }
+    </script>
 </body>
 </html>
+

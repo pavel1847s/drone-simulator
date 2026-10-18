@@ -425,3 +425,31 @@ filter: brightness(1.15);
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
 }
+/* --- СУПЕР-ФИКС ДЛЯ ВСЕХ ПОЛНОЭКРАННЫХ СТРАНИЦ --- */
+.hero-page, .fullscreen-page {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #000 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+}
+
+.hero-wrapper, .fullscreen-wrapper {
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: calc(100vh * 1440 / 1024) !important;
+    max-height: 100vh !important;
+    aspect-ratio: 1440 / 1024 !important;
+}
+
+.hero-image, .fullscreen-image {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: fill !important;
+    display: block !important;
+}

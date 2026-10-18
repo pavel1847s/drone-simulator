@@ -24,3 +24,11 @@
 
 </body>
 </html>
+    <!-- Юзернейм внизу по центру -->
+    {% if session.username %}
+    <div style="position: absolute; bottom: 20px; width: 100%; text-align: center; z-index: 100; pointer-events: none;">
+        <span style="color: rgba(255,255,255,0.6); font-size: 16px; letter-spacing: 2px; background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 20px;">
+            👤 Вы вошли как: <strong style="color: #55d66b;">{{ session.username }}</strong>
+        </span>
+    </div>
+    {% endif %}

@@ -36,7 +36,7 @@
 
         <!-- Экран взрыва -->
         <div class="explosion-overlay" id="explosion-overlay">
-            <h1 class="explosion-text">ДРОН БЫЛ ВЗОРВАН!</h1>
+            <h1 class="explosion-text" id="explosion-text">ДРОН БЫЛ ВЗОРВАН!</h1>
             <a href="/search" class="btn-restart">НАЙТИ НОВОГО ДРОНА</a>
         </div>
         
@@ -54,7 +54,13 @@
             <strong id="drone-battery-display">...</strong>
         </div>
 
-        <!-- НОВЫЙ БЛОК: Грузы -->
+        <!-- БЛОК ТАЙМЕРА -->
+        <div class="parameter" style="background: rgba(255, 0, 0, 0.1); border: 1px solid #ff0000;">
+            <span>Таймер</span>
+            <strong id="timer-display" style="color: #ff5555;">01:00</strong>
+        </div>
+
+        <!-- БЛОК ГРУЗОВ -->
         <div class="parameter" style="background: rgba(216, 117, 40, 0.1); border: 1px solid #d87528;">
             <span>Грузы</span>
             <strong id="cargo-display">0 / 3</strong>
@@ -65,10 +71,7 @@
         <div class="parameter"><span>A / ←</span><strong>Влево</strong></div>
         <div class="parameter"><span>D / →</span><strong>Вправо</strong></div>
         <div class="parameter"><span>Пробел</span><strong>Взлёт / Посадка</strong></div>
-        
-        <!-- НОВЫЙ БЛОК: Клавиша E -->
         <div class="parameter"><span>E</span><strong>Собрать груз</strong></div>
-        
         <div class="parameter"><span>R</span><strong>Новая игра</strong></div>
 
         <div class="parameter">

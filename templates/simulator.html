@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Симулятор — Автономный БПЛА</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body class="sim-page">
 
 <header>
-    <a href="index.html" class="logo">Автономный БПЛА</a>
+    <a href="/" class="logo">Автономный БПЛА</a>
     <div class="status"><span class="dot"></span>СИСТЕМА В СЕТИ</div>
 </header>
 
@@ -22,11 +22,11 @@
             <div class="point point-b" id="point-b">B</div>
 
             <img id="drone" class="drone"
-                 data-front="images/drone-front.jpg"
-                 data-back="images/drone-back.jpg"
-                 data-left="images/drone-left.jpg"
-                 data-right="images/drone-right.jpg"
-                 src="images/drone-back.jpg"
+                 data-front="/static/images/drone-front.jpg"
+                 data-back="/static/images/drone-back.jpg"
+                 data-left="/static/images/drone-left.jpg"
+                 data-right="/static/images/drone-right.jpg"
+                 src="/static/images/drone-back.jpg"
                  alt="Беспилотный летательный аппарат">
         </div>
 
@@ -57,6 +57,6 @@
     </aside>
 </main>
 
-<script src="simulator.js"></script>
+<script src="/static/simulator.js"></script>
 </body>
 </html>

@@ -13,7 +13,7 @@ const distanceEl = document.getElementById("distance");
 const statusEl = document.getElementById("flight-status");
 const restartBtn = document.getElementById("restart-button");
 const explosionOverlay = document.getElementById("explosion-overlay");
-const cargoDisplay = document.getElementById("cargo-display"); // Добавим в HTML
+const cargoDisplay = document.getElementById("cargo-display");
 
 const urlParams = new URLSearchParams(window.location.search);
 const droneSerial = urlParams.get('serial') || '12345';
@@ -38,8 +38,8 @@ const houseImages = [
 ];
 
 let houses = [];
-let cargos = []; // Массив для грузов
-let collectedCargos = 0; // Счетчик собранных
+let cargos = []; 
+let collectedCargos = 0; 
 let dronePos = { x: 0, y: 0 };
 let targetPos = { x: 0, y: 0 };
 let startPos = { x: 0, y: 0 };
@@ -126,14 +126,17 @@ function generateMap() {
         houses = [];
         const GRID_COLS = 7; const GRID_ROWS = 5; 
         const CELL_W = 100 / GRID_COLS; const CELL_H = 100 / GRID_ROWS;
+        
         for (let r = 0; r < GRID_ROWS; r++) {
             for (let c = 0; c < GRID_COLS; c++) {
                 if (Math.random() > 0.8) continue;
                 const w = rand(9, 12); const h = rand(12, 15); 
                 let hx = c * CELL_W + (CELL_W - w) / 2 + rand(-1, 1);
                 let hy = r * CELL_H + (CELL_H - h) / 2 + rand(-1, 1);
+                
                 if (!isHouseOverlapping(hx, hy, w, h)) {
                     houses.push({ x: hx, y: hy, w: w, h: h });
+                    
                     if (Math.random() < 0.6) {
                         const dir = Math.floor(Math.random() * 4); let dx = 0, dy = 0;
                         if (dir === 0) dx = w - 1; if (dir === 1) dx = -w + 1;
@@ -148,7 +151,9 @@ function generateMap() {
             }
         }
         
+        // ВАЖНО: сначала находим старт и финиш
         dronePos = findFreePoint();
+        startPos = { x: dronePos.x, y: dronePos.y }; // Запоминаем точку А
         targetPos = findTargetFarFrom(dronePos);
         
         // Спавним грузы в случайных свободных местах
@@ -157,14 +162,13 @@ function generateMap() {
         while (cargos.length < TOTAL_CARGOS && cargoTries < 100) {
             cargoTries++;
             const p = findFreePoint();
-            // Груз не должен быть слишком близко к старту или финишу
+            // Груз не должен быть слишком близко к старту или финишу (используем startPos корректно)
             if (Math.hypot(p.x - startPos.x, p.y - startPos.y) > 15 && Math.hypot(p.x - targetPos.x, p.y - targetPos.y) > 15) {
                 cargos.push({ x: p.x, y: p.y, collected: false });
             }
         }
         
         if (checkPath(dronePos, targetPos)) {
-            startPos = { x: dronePos.x, y: dronePos.y };
             return; 
         }
     }
@@ -214,9 +218,13 @@ function update(dt) {
         triggerExplosion();
         return;
     }
-    dronePos.x = nx; dronePos.y = ny;
+    
+    dronePos.x = nx; 
+    dronePos.y = ny;
     updateDroneImage(dx, dy);
     updateDronePosition();
+    
+    checkWin(); // <--- ВОТ ЭТА СТРОКА БЫЛА УДАЛЕНА, ТЕПЕРЬ ОНА НА МЕСТЕ
 }
 
 function updateDroneImage(dx, dy) {
@@ -242,11 +250,10 @@ function tryCollectCargo() {
             cargoDisplay.textContent = `${collectedCargos} / ${TOTAL_CARGOS}`;
             renderCargos(); // Перерисовываем, чтобы исчез
             
-            // Звуковой сигнал (опционально, если добавишь)
             if (collectedCargos === TOTAL_CARGOS) {
                 statusEl.textContent = "ВСЕ ГРУЗЫ СОБРАНЫ! ЛЕТИМ В Б!";
                 statusEl.style.color = "#55d66b";
-                pointB.style.animation = "pulse 0.5s infinite"; // Ускоряем пульсацию точки Б
+                pointB.style.animation = "pulse 0.5s infinite"; 
             }
             return;
         }
@@ -267,7 +274,7 @@ function checkWin() {
         statusEl.textContent = "ЦЕЛЬ ДОСТИГНУТА";
         statusEl.style.color = "#55d66b";
         winMessage.classList.add("visible");
-        sendStats('win'); // Отправляем на сервер
+        sendStats('win'); 
     }
 }
 
@@ -276,7 +283,7 @@ function triggerExplosion() {
     statusEl.textContent = "УНИЧТОЖЕН";
     statusEl.style.color = "#ff0000";
     if (explosionOverlay) explosionOverlay.classList.add("visible");
-    sendStats('loss'); // Отправляем на сервер
+    sendStats('loss'); 
 }
 
 // ===== ФУНКЦИЯ ОТПРАВКИ ДАННЫХ =====
@@ -295,7 +302,7 @@ function newGame() {
     if (explosionOverlay) explosionOverlay.classList.remove("visible");
     statusEl.textContent = "НА ЗЕМЛЕ";
     statusEl.style.color = "#eee";
-    pointB.style.animation = "pulse 1.5s infinite"; // Возвращаем стандартную пульсацию
+    pointB.style.animation = "pulse 1.5s infinite"; 
 
     collectedCargos = 0;
     cargoDisplay.textContent = `0 / ${TOTAL_CARGOS}`;
@@ -340,7 +347,7 @@ document.addEventListener("keydown", e => {
     keys[e.code] = true;
     if (e.code === "KeyR") newGame();
     if (e.code === "Space") toggleFlight();
-    if (e.code === "KeyE") tryCollectCargo(); // Кнопка E
+    if (e.code === "KeyE") tryCollectCargo();
 
     if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space", "KeyE"].includes(e.code)) {
         e.preventDefault();

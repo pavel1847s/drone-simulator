@@ -4,31 +4,99 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Автономный БПЛА</title>
-    <meta name="yandex-verification" content="57e5f0ad11fa9007" />
-    <meta name="google-site-verification" content="wen3rQoti0yn--_c4-xbCwSycM1Ts88tozyCzFGwmuc" />
-    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        /* Стили для кнопок входа (чтобы они были поверх картинки) */
+        .auth-buttons {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            z-index: 100;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+        .auth-buttons a, .auth-buttons span {
+            font-size: 14px;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+        .btn-login {
+            color: #fff;
+            border: 1px solid #55d66b;
+        }
+        .btn-login:hover { background: rgba(85, 214, 107, 0.2); }
+        
+        .btn-register {
+            color: #000;
+            background: #55d66b;
+            font-weight: bold;
+        }
+        .btn-register:hover { background: #45b558; }
+        
+        .btn-logout {
+            color: #ff5555;
+            border: 1px solid #ff5555;
+        }
+        .btn-logout:hover { background: rgba(255, 85, 85, 0.2); }
+        
+        .username-display {
+            color: #55d66b;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        /* Стили для юзернейма внизу по центру */
+        .bottom-username {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            z-index: 100;
+            pointer-events: none;
+        }
+        .bottom-username span {
+            color: rgba(255,255,255,0.7);
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            letter-spacing: 2px;
+            background: rgba(0,0,0,0.6);
+            padding: 6px 20px;
+            border-radius: 20px;
+            border: 1px solid #333;
+        }
+    </style>
 </head>
 <body class="hero-page">
 
-    <div class="hero-wrapper">
+    <!-- Кнопки аккаунта (справа сверху) -->
+    <div class="auth-buttons">
+        {% if session.username %}
+            <span class="username-display">👤 {{ session.username }}</span>
+            <a href="/logout" class="btn-logout">Выйти</a>
+        {% else %}
+            <a href="/login" class="btn-login">Войти</a>
+            <a href="/register" class="btn-register">Регистрация</a>
+        {% endif %}
+    </div>
 
-        <img class="hero-image"
-             src="static/images/hero.jpg"
-             alt="Автономный БПЛА">
+    <div class="hero-wrapper">
+        <img class="hero-image" src="/static/images/hero.jpg" alt="Автономный БПЛА">
 
         <a href="/device" class="hero-btn hero-btn-1"></a>
-<a href="/tutorial" class="hero-btn hero-btn-2"></a>
-<a href="/search" class="hero-btn hero-btn-3"></a>
-
+        <a href="/tutorial" class="hero-btn hero-btn-2"></a>
+        <a href="/search" class="hero-btn hero-btn-3"></a> <!-- Ведет на поиск дрона -->
     </div>
+
+    <!-- Юзернейм внизу по центру -->
+    {% if session.username %}
+    <div class="bottom-username">
+        <span>👤 Вы вошли как: <strong style="color: #55d66b;">{{ session.username }}</strong></span>
+    </div>
+    {% endif %}
 
 </body>
 </html>
-    <!-- Юзернейм внизу по центру -->
-    {% if session.username %}
-    <div style="position: absolute; bottom: 20px; width: 100%; text-align: center; z-index: 100; pointer-events: none;">
-        <span style="color: rgba(255,255,255,0.6); font-size: 16px; letter-spacing: 2px; background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 20px;">
-            👤 Вы вошли как: <strong style="color: #55d66b;">{{ session.username }}</strong>
-        </span>
-    </div>
-    {% endif %}

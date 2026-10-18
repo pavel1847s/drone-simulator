@@ -272,4 +272,25 @@ button:hover {
 .btn-restart:hover {
     transform: scale(1.05);
 }
+/* Кнопка выхода в меню */
+.btn-menu {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    margin-top: 10px;
+    border: 1px solid #555;
+    background: transparent;
+    color: #eee;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: 0.2s;
+}
 
+.btn-menu:hover {
+    background: #25282c;
+    border-color: #777;
+}

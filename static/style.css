@@ -294,3 +294,21 @@ button:hover {
     background: #25282c;
     border-color: #777;
 }
+/* ГРУЗЫ */
+.cargo {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: #ffcc00;
+    border: 2px solid #fff;
+    box-shadow: 0 0 15px #ffcc00, inset 0 0 10px #ff9900;
+    transform: translate(-50%, -50%) rotate(45deg);
+    z-index: 4;
+    pointer-events: none;
+    animation: float 1.5s infinite alternate;
+}
+
+@keyframes float {
+    from { transform: translate(-50%, -50%) rotate(45deg) scale(1); }
+    to { transform: translate(-50%, -50%) rotate(45deg) scale(1.2); }
+}

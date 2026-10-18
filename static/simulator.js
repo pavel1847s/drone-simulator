@@ -17,6 +17,11 @@ const explosionText = document.getElementById("explosion-text");
 const cargoDisplay = document.getElementById("cargo-display");
 const timerDisplay = document.getElementById("timer-display");
 
+// Элементы мобильной панели
+const mobTimer = document.getElementById("mob-timer");
+const mobBattery = document.getElementById("mob-battery");
+const mobCargo = document.getElementById("mob-cargo");
+
 const urlParams = new URLSearchParams(window.location.search);
 const droneSerial = urlParams.get('serial') || '12345';
 const droneBattery = urlParams.get('battery') || '75';
@@ -25,6 +30,7 @@ const serialDisplay = document.getElementById("drone-serial-display");
 const batteryDisplay = document.getElementById("drone-battery-display");
 if (serialDisplay) serialDisplay.textContent = droneSerial;
 if (batteryDisplay) batteryDisplay.textContent = droneBattery + "%";
+if (mobBattery) mobBattery.textContent = droneBattery + "%";
 
 const droneImages = {
     front: drone.dataset.front,
@@ -201,17 +207,94 @@ function renderCargos() {
     }
 }
 
+// ===== МОБИЛЬНОЕ УПРАВЛЕНИЕ (СВАЙПЫ) =====
+let touchStart = null;
+let touchStartTime = 0;
+let lastTapTime = 0;
+let mobileDx = 0;
+let mobileDy = 0;
+const scene = document.querySelector('.scene');
+
+scene.addEventListener('touchstart', (e) => {
+    touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    touchStartTime = Date.now();
+}, { passive: false });
+
+scene.addEventListener('touchmove', (e) => {
+    if (!touchStart) return;
+    e.preventDefault();
+
+    const touch = e.touches[0];
+    let dx = touch.clientX - touchStart.x;
+    let dy = touch.clientY - touchStart.y;
+    
+    const deadZone = 15;
+    const dist = Math.hypot(dx, dy);
+    
+    if (dist < deadZone) {
+        mobileDx = 0; mobileDy = 0;
+    } else {
+        const speedMultiplier = Math.min(dist / 60, 1); 
+        mobileDx = (dx / dist) * speedMultiplier;
+        mobileDy = (dy / dist) * speedMultiplier;
+    }
+}, { passive: false });
+
+scene.addEventListener('touchend', (e) => {
+    if (!touchStart) return;
+    const touchEndTime = Date.now();
+    const duration = touchEndTime - touchStartTime;
+    
+    const touch = e.changedTouches[0];
+    const dx = touch.clientX - touchStart.x;
+    const dy = touch.clientY - touchStart.y;
+    const dist = Math.hypot(dx, dy);
+
+    // Обработка двойного нажатия (если это был тап, а не свайп)
+    if (dist < 20 && duration < 300) {
+        const now = Date.now();
+        const timeSinceLastTap = now - lastTapTime;
+        
+        if (timeSinceLastTap < 300 && timeSinceLastTap > 0) {
+            // Правая сторона - Взлет/Посадка, Левая - Сбор груза
+            if (touch.clientX > window.innerWidth / 2) {
+                toggleFlight();
+            } else {
+                tryCollectCargo();
+            }
+            lastTapTime = 0;
+        } else {
+            lastTapTime = now;
+        }
+    }
+
+    touchStart = null;
+    mobileDx = 0;
+    mobileDy = 0;
+});
+
 // ===== ДВИЖЕНИЕ И СТОЛКНОВЕНИЕ =====
 function update(dt) {
     if (won || !flying) return;
     let dx = 0, dy = 0;
+    
+    // Ввод с клавиатуры
     if (keys["KeyW"] || keys["ArrowUp"])    dy -= 1;
     if (keys["KeyS"] || keys["ArrowDown"])  dy += 1;
     if (keys["KeyA"] || keys["ArrowLeft"])  dx -= 1;
     if (keys["KeyD"] || keys["ArrowRight"]) dx += 1;
 
-    if (!dx && !dy) return;
-    const len = Math.hypot(dx, dy); dx /= len; dy /= len;
+    // Ввод свайпом (если есть касание)
+    if (touchStart) {
+        dx = mobileDx;
+        dy = mobileDy;
+    }
+
+    if (dx === 0 && dy === 0) return;
+    
+    const len = Math.hypot(dx, dy); 
+    if (len > 1) { dx /= len; dy /= len; }
+    
     const step = DRONE_SPEED * dt;
     const nx = dronePos.x + dx * step;
     const ny = dronePos.y + dy * step;
@@ -248,6 +331,7 @@ function tryCollectCargo() {
             cargos[i].collected = true;
             collectedCargos++;
             cargoDisplay.textContent = `${collectedCargos} / ${TOTAL_CARGOS}`;
+            if (mobCargo) mobCargo.textContent = `${collectedCargos}/${TOTAL_CARGOS}`; // Обновляем мобильную панель
             renderCargos(); 
             
             if (collectedCargos === TOTAL_CARGOS) {
@@ -271,7 +355,7 @@ function checkWin() {
         }
         won = true;
         flying = false;
-        if (timerInterval) clearInterval(timerInterval); // Стоп таймер
+        if (timerInterval) clearInterval(timerInterval); 
         statusEl.textContent = "ЦЕЛЬ ДОСТИГНУТА";
         statusEl.style.color = "#55d66b";
         winMessage.classList.add("visible");
@@ -281,7 +365,7 @@ function checkWin() {
 
 function triggerExplosion(msg = "ДРОН БЫЛ ВЗОРВАН!") {
     won = true; flying = false;
-    if (timerInterval) clearInterval(timerInterval); // Стоп таймер
+    if (timerInterval) clearInterval(timerInterval); 
     statusEl.textContent = "УНИЧТОЖЕН";
     statusEl.style.color = "#ff0000";
     if (explosionOverlay) {
@@ -296,14 +380,18 @@ function startTimer() {
     if (timerInterval) clearInterval(timerInterval);
     timeLeft = 60;
     timerDisplay.textContent = "01:00";
+    if (mobTimer) mobTimer.textContent = "01:00";
     
     timerInterval = setInterval(() => {
-        if (won || !flying) return; // Если игра окончена, таймер стоит
+        if (won || !flying) return; 
         
         timeLeft--;
         const min = Math.floor(timeLeft / 60);
         const sec = timeLeft % 60;
-        timerDisplay.textContent = `0${min}:${sec < 10 ? '0' : ''}${sec}`;
+        const timeStr = `0${min}:${sec < 10 ? '0' : ''}${sec}`;
+        
+        timerDisplay.textContent = timeStr;
+        if (mobTimer) mobTimer.textContent = timeStr; // Обновляем мобильную панель
         
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
@@ -312,7 +400,6 @@ function startTimer() {
     }, 1000);
 }
 
-// ===== ФУНКЦИЯ ОТПРАВКИ ДАННЫХ =====
 function sendStats(result) {
     fetch('/api/update_stats', {
         method: 'POST',
@@ -326,7 +413,9 @@ function newGame() {
     won = false; flying = false;
     if (timerInterval) clearInterval(timerInterval);
     timeLeft = 60;
+    
     timerDisplay.textContent = "01:00";
+    if (mobTimer) mobTimer.textContent = "01:00";
     
     winMessage.classList.remove("visible");
     if (explosionOverlay) explosionOverlay.classList.remove("visible");
@@ -336,6 +425,7 @@ function newGame() {
 
     collectedCargos = 0;
     cargoDisplay.textContent = `0 / ${TOTAL_CARGOS}`;
+    if (mobCargo) mobCargo.textContent = `0/${TOTAL_CARGOS}`;
 
     generateMap();
     renderHouses();
@@ -357,7 +447,6 @@ function toggleFlight() {
     statusEl.style.color = "#eee";
     drone.style.transform = flying ? "translate(-50%, -50%) scale(1)" : "translate(-50%, -50%) scale(0.85)";
     
-    // Запуск таймера только при взлете
     if (flying && timeLeft === 60) {
         startTimer();
     }
@@ -389,4 +478,3 @@ function loop(t) {
 
 newGame();
 requestAnimationFrame(loop);
-

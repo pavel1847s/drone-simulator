@@ -1,14 +1,14 @@
 // ===== НАСТРОЙКИ =====
-const COLS = 5;              // столбцов сетки
-const ROWS = 4;              // строк сетки
+const COLS = 5;
+const ROWS = 4;
 const CELL_W = 100 / COLS;
 const CELL_H = 100 / ROWS;
 const HOUSE_W = 12;
 const HOUSE_H = 14;
-const HOUSE_CHANCE = 0.6;    // плотность домов
-const DRONE_RADIUS = 3;      // "толщина" дрона в %
-const DRONE_SPEED = 30;      // % в секунду
-const WIN_DISTANCE = 4;      // % до точки B
+const HOUSE_CHANCE = 0.6;
+const DRONE_RADIUS = 3;
+const DRONE_SPEED = 30;
+const WIN_DISTANCE = 4;
 
 const city = document.getElementById("city");
 const drone = document.getElementById("drone");
@@ -18,6 +18,18 @@ const winMessage = document.getElementById("win-message");
 const distanceEl = document.getElementById("distance");
 const statusEl = document.getElementById("flight-status");
 const restartBtn = document.getElementById("restart-button");
+const explosionOverlay = document.getElementById("explosion-overlay");
+
+// Читаем номер и заряд дрона из ссылки, по которой пришел пользователь
+const urlParams = new URLSearchParams(window.location.search);
+const droneSerial = urlParams.get('serial') || '12345';
+const droneBattery = urlParams.get('battery') || '75';
+
+// Выводим их в панель справа
+const serialDisplay = document.getElementById("drone-serial-display");
+const batteryDisplay = document.getElementById("drone-battery-display");
+if (serialDisplay) serialDisplay.textContent = droneSerial;
+if (batteryDisplay) batteryDisplay.textContent = droneBattery + "%";
 
 const droneImages = {
     front: drone.dataset.front,
@@ -44,14 +56,13 @@ const rand = (a, b) => a + Math.random() * (b - a);
 // ===== ГЕНЕРАЦИЯ ДОМОВ =====
 function generateHouses() {
     houses = [];
-    // Гарантируем минимум 1 проход в каждой строке и каждом столбце
     const freeRow = Math.floor(Math.random() * ROWS);
     const freeCol = Math.floor(Math.random() * COLS);
 
     for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
-            if (r === freeRow || c === freeCol) continue;   // свободная линия
-            if (Math.random() > HOUSE_CHANCE) continue;     // случайная пустота
+            if (r === freeRow || c === freeCol) continue;
+            if (Math.random() > HOUSE_CHANCE) continue;
 
             const cx = c * CELL_W + CELL_W / 2;
             const cy = r * CELL_H + CELL_H / 2;
@@ -108,7 +119,7 @@ function renderHouses() {
     }
 }
 
-// ===== ДВИЖЕНИЕ =====
+// ===== ДВИЖЕНИЕ И СТОЛКНОВЕНИЕ =====
 function update(dt) {
     if (won || !flying) return;
 
@@ -127,9 +138,15 @@ function update(dt) {
     const nx = dronePos.x + dx * step;
     const ny = dronePos.y + dy * step;
 
-    // Раздельные оси — можно скользить вдоль стен
-    if (pointFree(nx, dronePos.y)) dronePos.x = nx;
-    if (pointFree(dronePos.x, ny)) dronePos.y = ny;
+    // НОВАЯ ЛОГИКА: Если врезаемся в дом, вызываем взрыв
+    if (!pointFree(nx, ny)) {
+        triggerExplosion();
+        return;
+    }
+
+    // Если свободно - двигаемся
+    dronePos.x = nx;
+    dronePos.y = ny;
 
     updateDroneImage(dx, dy);
     updateDronePosition();
@@ -161,11 +178,23 @@ function checkWin() {
     }
 }
 
+// ===== ФУНКЦИЯ ВЗРЫВА =====
+function triggerExplosion() {
+    won = true;
+    flying = false;
+    statusEl.textContent = "УНИЧТОЖЕН";
+    if (explosionOverlay) {
+        explosionOverlay.classList.add("visible");
+    }
+}
+
 // ===== НОВАЯ ИГРА =====
 function newGame() {
     won = false;
     flying = false;
     winMessage.classList.remove("visible");
+    // Скрываем экран взрыва при перезапуске
+    if (explosionOverlay) explosionOverlay.classList.remove("visible");
     statusEl.textContent = "НА ЗЕМЛЕ";
 
     generateHouses();
@@ -188,7 +217,6 @@ function toggleFlight() {
     if (won) return;
     flying = !flying;
     statusEl.textContent = flying ? "В ПОЛЁТЕ" : "НА ЗЕМЛЕ";
-    // Визуальный индикатор: на земле дрон чуть меньше
     drone.style.transform = flying
         ? "translate(-50%, -50%) scale(1)"
         : "translate(-50%, -50%) scale(0.85)";

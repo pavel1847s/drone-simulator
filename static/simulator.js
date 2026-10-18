@@ -1,5 +1,5 @@
 // ===== НАСТРОЙКИ =====
-const DRONE_RADIUS = 2.5;   // Радиус дрона
+const DRONE_RADIUS = 2;     // Уменьшили радиус, чтобы дрон мог пролетать в узких местах
 const DRONE_SPEED = 30;
 const WIN_DISTANCE = 4;
 
@@ -51,7 +51,7 @@ function pointFree(x, y) {
     if (x - m < 0 || x + m > 100) return false;
     if (y - m < 0 || y + m > 100) return false;
 
-    const PAD_X = 3.5; // Отступ сбоку (чтобы дрон не задевал прозрачные пиксели PNG)
+    const PAD_X = 3;   // Отступ сбоку
     const PAD_Y = 3;   // Отступ сверху/снизу
 
     for (const h of houses) {
@@ -62,9 +62,10 @@ function pointFree(x, y) {
 }
 
 // ===== ПРОВЕРКА ПЕРЕСЕЧЕНИЯ ДОМОВ =====
-// Эта функция не дает домам спавниться друг на друге
 function isHouseOverlapping(x, y, w, h) {
-    const padding = -1; // Небольшое перекрытие (дома могут слегка касаться)
+    // Уменьшили отступ до 1, чтобы дома стояли плотнее
+    const padding = 1; 
+    
     for (const other of houses) {
         if (x < other.x + other.w + padding &&
             x + w > other.x - padding &&
@@ -94,7 +95,7 @@ function findTargetFarFrom(start) {
 
 // ===== ПРОВЕРКА ПУТИ (BFS) =====
 function checkPath(start, end) {
-    const step = 2;
+    const step = 1.5; // Уменьшили шаг проверки для большей точности в узких местах
     const visited = new Set();
     const queue = [{ x: start.x, y: start.y }];
     visited.add(`${Math.floor(start.x/step)},${Math.floor(start.y/step)}`);
@@ -108,7 +109,7 @@ function checkPath(start, end) {
         const px = Math.floor(p.x/step);
         const py = Math.floor(p.y/step);
         
-        if (Math.abs(px - endX) <= 2 && Math.abs(py - endY) <= 2) return true;
+        if (Math.abs(px - endX) <= 3 && Math.abs(py - endY) <= 3) return true;
         
         for (const [dx, dy] of dirs) {
             const nx = px + dx;
@@ -135,50 +136,48 @@ function checkPath(start, end) {
 function generateHouses() {
     let attempts = 0;
     
-    while (attempts < 100) {
+    while (attempts < 150) { // Увеличили попытки, чтобы найти плотную карту с проходом
         attempts++;
         houses = [];
         
-        // Создаем 8-12 кластеров (кварталов)
-        const numSeeds = 8 + Math.floor(Math.random() * 5); 
-        for (let i = 0; i < numSeeds; i++) {
-            const cx = rand(15, 85);
-            const cy = rand(15, 85);
-            const count = 2 + Math.floor(Math.random() * 3); // 2-4 дома в кластере
-            
-            let placedInCluster = 0;
-            let clusterTries = 0;
-            
-            // Пытаемся поставить дома в этом кластере
-            while (placedInCluster < count && clusterTries < 20) {
-                clusterTries++;
-                const w = rand(8, 12);
-                const h = rand(10, 14);
-                
-                // Разброс внутри кластера (было -6..6, стало -12..12)
-                const hx = Math.max(2, Math.min(98 - w, cx + rand(-12, 12) - w/2));
-                const hy = Math.max(2, Math.min(98 - h, cy + rand(-12, 12) - h/2));
-                
-                // Если дом не налазит на другие - ставим его
+        // Сетка стала плотнее: 7 колонок и 5 рядов
+        const GRID_COLS = 7; 
+        const GRID_ROWS = 5; 
+        const CELL_W = 100 / GRID_COLS;
+        const CELL_H = 100 / GRID_ROWS;
+        
+        for (let r = 0; r < GRID_ROWS; r++) {
+            for (let c = 0; c < GRID_COLS; c++) {
+                if (Math.random() > 0.85) continue; // 85% шанс появления дома (было 75%)
+
+                // Дома стали чуть больше
+                const w = rand(10, 13); 
+                const h = rand(14, 17); 
+
+                let hx = c * CELL_W + (CELL_W - w) / 2;
+                let hy = r * CELL_H + (CELL_H - h) / 2;
+
+                hx += rand(-1.5, 1.5);
+                hy += rand(-2, 2);
+
+                hx = Math.max(2, Math.min(98 - w, hx));
+                hy = Math.max(2, Math.min(98 - h, hy));
+
                 if (!isHouseOverlapping(hx, hy, w, h)) {
                     houses.push({ x: hx, y: hy, w: w, h: h });
-                    placedInCluster++;
                 }
             }
         }
         
-        // Ищем стартовые точки
         dronePos = findFreePoint();
         targetPos = findTargetFarFrom(dronePos);
         
-        // Проверяем, есть ли путь
         if (checkPath(dronePos, targetPos)) {
             startPos = { x: dronePos.x, y: dronePos.y };
-            return; // Путь есть! Оставляем карту.
+            return; 
         }
     }
     
-    // Запасной вариант
     houses = [];
     dronePos = { x: 10, y: 10 };
     startPos = { x: 10, y: 10 };

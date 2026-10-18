@@ -1,20 +1,86 @@
 * {
-box-sizing: border-box;
+    box-sizing: border-box;
 }
+
 body {
-margin: 0;
-background: #111315;
-color: #eeeeee;
-font-family: Arial, sans-serif;
+    margin: 0;
+    background: #111315;
+    color: #eeeeee;
+    font-family: Arial, sans-serif;
 }
+
+/* --- ГЛАВНАЯ СТРАНИЦА И СТРАНИЦЫ DEVICE/TUTORIAL --- */
+.hero-page, .fullscreen-page {
+    margin: 0;
+    background: #000;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100vw;
+}
+
+.hero-wrapper, .fullscreen-wrapper {
+    position: relative;
+    aspect-ratio: 1440 / 1024;
+    width: 100%;
+    max-width: calc(100vh * 1440 / 1024);
+    max-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-image, .fullscreen-image {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    display: block;
+}
+
+/* Кнопки на главной */
+.hero-btn {
+    position: absolute;
+    display: block;
+    cursor: pointer;
+    border-radius: 12px;
+    transition: background 0.2s ease;
+}
+.hero-btn:hover {
+    background: rgba(85, 214, 107, 0.2);
+}
+.hero-btn-1 { left: 6%;  top: 68%; width: 28%; height: 16%; }
+.hero-btn-2 { left: 36%; top: 68%; width: 28%; height: 16%; }
+.hero-btn-3 { left: 66%; top: 68%; width: 28%; height: 16%; }
+
+/* Кнопка назад на device/tutorial */
+.image-btn {
+    position: absolute;
+    display: block;
+    cursor: pointer;
+    border-radius: 12px;
+    transition: background 0.2s ease;
+}
+.image-btn:hover {
+    background: rgba(85, 214, 107, 0.2);
+}
+.image-btn-back {
+    left: 4%;
+    bottom: 1%;
+    width: 14%;
+    height: 6%;
+}
+
+/* --- СИМУЛЯТОР --- */
 header {
-height: 70px;
-display: flex;
-align-items: center;
-justify-content: space-between;
-padding: 0 30px;
-border-bottom: 1px solid #303030;
-background: #181a1d;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    border-bottom: 1px solid #303030;
+    background: #181a1d;
 }
 .logo {
     font-size: 20px;
@@ -24,349 +90,93 @@ background: #181a1d;
     text-decoration: none;
 }
 .status {
-font-size: 13px;
-color: #aaaaaa;
+    font-size: 13px;
+    color: #aaaaaa;
 }
 .dot {
-display: inline-block;
-width: 8px;
-height: 8px;
-background: #55d66b;
-border-radius: 50%;
-margin-right: 7px;
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #55d66b;
+    border-radius: 50%;
+    margin-right: 7px;
 }
 main {
-display: flex;
-height: calc(100vh - 70px);
+    display: flex;
+    height: calc(100vh - 70px);
 }
 .scene {
-flex: 1;
-position: relative;
-background: #202428;
-overflow: hidden;
+    flex: 1;
+    position: relative;
+    background: #202428;
+    overflow: hidden;
 }
 .scene-title {
-position: absolute;
-top: 20px;
-left: 25px;
-font-size: 13px;
-color: #888;
-
-letter-spacing: 1px;
-
-z-index: 20;
+    position: absolute;
+    top: 20px;
+    left: 25px;
+    font-size: 13px;
+    color: #888;
+    letter-spacing: 1px;
+    z-index: 20;
 }
-/* ГОРОД */
 .city {
-position: absolute;
-inset: 0;
+    position: absolute;
+    inset: 0;
 }
-/* ДОМА */
 .house {
-position: absolute;
-width: 120px;
-height: 100px;
-
-object-fit: contain;
-
-user-select: none;
-pointer-events: none;
-
-z-index: 2;
+    position: absolute;
+    object-fit: contain;
+    user-select: none;
+    pointer-events: none;
+    z-index: 2;
 }
-/* Расстановка домов */
-.house1 {
-left: 8%;
-top: 18%;
-}
-.house2 {
-left: 32%;
-top: 12%;
-}
-.house3 {
-left: 60%;
-top: 18%;
-}
-.house4 {
-left: 78%;
-top: 38%;
-}
-.house5 {
-left: 50%;
-top: 48%;
-}
-.house6 {
-left: 22%;
-top: 55%;
-}
-.house7 {
-left: 5%;
-top: 72%;
-}
-.house8 {
-left: 38%;
-top: 72%;
-}
-.house9 {
-left: 70%;
-top: 72%;
-}
-/* МАРШРУТ */
-#route {
-position: absolute;
-left: 10%;
-top: 70%;
-
-width: 0;
-height: 4px;
-
-background: #55d66b;
-
-z-index: 3;
-
-opacity: 0;
-
-box-shadow: 0 0 8px rgba(85, 214, 107, 0.7);
-}
-/* ДРОН */
 .drone {
-position: absolute;
-width: 75px;
-height: 75px;
-
-object-fit: contain;
-
-left: 10%;
-top: 70%;
-
-transform: translate(-50%, -50%);
-
-z-index: 10;
-
-user-select: none;
-pointer-events: none;
+    position: absolute;
+    width: 75px;
+    height: 75px;
+    object-fit: contain;
+    left: 10%;
+    top: 70%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    user-select: none;
+    pointer-events: none;
 }
-/* ПАНЕЛЬ */
 aside {
-width: 300px;
-padding: 25px;
-
-background: #181a1d;
-
-border-left: 1px solid #303030;
+    width: 300px;
+    padding: 25px;
+    background: #181a1d;
+    border-left: 1px solid #303030;
 }
 aside h2 {
-margin-top: 0;
-font-size: 18px;
+    margin-top: 0;
+    font-size: 18px;
 }
 .parameter {
-display: flex;
-justify-content: space-between;
-
-padding: 16px 0;
-
-border-bottom: 1px solid #2b2d30;
-
-color: #999;
+    display: flex;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid #2b2d30;
+    color: #999;
 }
 .parameter strong {
-color: #eee;
+    color: #eee;
 }
 button {
-width: 100%;
-padding: 14px;
-
-margin-top: 25px;
-
-border: 1px solid #555;
-
-background: #25282c;
-
-color: white;
-
-cursor: pointer;
-}
-button.start {
-margin-top: 10px;
-background: #d87528;
-
-border-color: #d87528;
+    width: 100%;
+    padding: 14px;
+    margin-top: 25px;
+    border: 1px solid #555;
+    background: #25282c;
+    color: white;
+    cursor: pointer;
 }
 button:hover {
-filter: brightness(1.15);
-}
-/* КНОПКА НАЗАД */
-.back-btn {
-    color: #aaaaaa;
-    text-decoration: none;
-    font-size: 14px;
-    letter-spacing: 1px;
-}
-.back-btn:hover {
-    color: #55d66b;
+    filter: brightness(1.15);
 }
 
-/* ГЛАВНАЯ */
-.page-main {
-    height: calc(100vh - 70px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 20px;
-    gap: 16px;
-}
-
-.hero-img {
-    max-width: 420px;
-    width: 100%;
-    height: auto;
-    margin-bottom: 10px;
-}
-
-.page-main h1 {
-    font-size: 42px;
-    margin: 0;
-    letter-spacing: 3px;
-}
-
-.subtitle {
-    color: #888;
-    margin: 0 0 30px;
-    font-size: 15px;
-    letter-spacing: 1px;
-}
-
-.menu-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    width: 320px;
-}
-
-.btn {
-    display: block;
-    padding: 16px;
-    background: #25282c;
-    border: 1px solid #555;
-    color: #fff;
-    text-decoration: none;
-    letter-spacing: 1px;
-    font-size: 14px;
-    transition: 0.2s;
-    text-align: center;
-}
-
-.btn:hover {
-    filter: brightness(1.2);
-}
-
-.btn-start {
-    background: #d87528;
-    border-color: #d87528;
-}
-
-/* ИНФО-СТРАНИЦЫ */
-.page-info {
-    height: calc(100vh - 70px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-
-.info-img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-}
-/* ГЛАВНАЯ СТРАНИЦА */
-.hero-page {
-    margin: 0;
-    background: #000;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-}
-
-.hero-wrapper {
-    position: relative;
-    aspect-ratio: 1440 / 1024;
-    width: 100%;
-    max-width: calc(100vh * 1440 / 1024);
-    max-height: 100vh;
-}
-
-.hero-image {
-    width: 100%;
-    height: 100%;
-    object-fit: fill;
-    display: block;
-}
-.hero-btn {
-    position: absolute;
-    display: block;
-    cursor: pointer;
-    border-radius: 12px;
-    transition: background 0.2s ease;
-}
-
-.hero-btn:hover {
-    background: rgba(85, 214, 107, 0.2);
-}
-
-.hero-btn-1 { left: 6%;  top: 68%; width: 28%; height: 16%; }
-.hero-btn-2 { left: 36%; top: 68%; width: 28%; height: 16%; }
-.hero-btn-3 { left: 66%; top: 68%; width: 28%; height: 16%; }
-/* ПОЛНОЭКРАННЫЕ СТРАНИЦЫ (device, tutorial) */
-/* ПОЛНОЭКРАННЫЕ СТРАНИЦЫ (device, tutorial) */
-.fullscreen-page {
-    margin: 0;
-    background: #000;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-}
-
-.fullscreen-wrapper {
-    position: relative;
-    aspect-ratio: 1440 / 1024;
-    width: 100%;
-    max-width: calc(100vh * 1440 / 1024);
-    max-height: 100vh;
-}
-
-.fullscreen-image {
-    width: 100%;
-    height: 100%;
-    object-fit: fill;
-    display: block;
-}
-/* КНОПКА НАЗАД НА DEVICE / TUTORIAL */
-.image-btn {
-    position: absolute;
-    display: block;
-    cursor: pointer;
-    border-radius: 12px;
-    transition: background 0.2s ease;
-}
-
-.image-btn:hover {
-    background: rgba(85, 214, 107, 0.2);
-}
-
-.image-btn-back {
-    left: 4%;
-    bottom: 1%;
-    width: 14%;
-    height: 6%;
-}
-/* ТОЧКИ A И B */
+/* Точки А и Б */
 .point {
     position: absolute;
     width: 40px;
@@ -381,27 +191,24 @@ filter: brightness(1.15);
     z-index: 5;
     pointer-events: none;
 }
-
 .point-a {
     background: rgba(85, 214, 107, 0.25);
     border: 3px solid #55d66b;
     color: #55d66b;
     box-shadow: 0 0 20px rgba(85, 214, 107, 0.6);
 }
-
 .point-b {
     background: rgba(216, 117, 40, 0.3);
     border: 3px solid #d87528;
     color: #d87528;
     animation: pulse 1.5s infinite;
 }
-
 @keyframes pulse {
     0%, 100% { transform: translate(-50%, -50%) scale(1);   box-shadow: 0 0 25px rgba(216, 117, 40, 0.8); }
     50%      { transform: translate(-50%, -50%) scale(1.2); box-shadow: 0 0 45px rgba(216, 117, 40, 1); }
 }
 
-/* СООБЩЕНИЕ О ПОБЕДЕ */
+/* Сообщение о победе */
 .win-message {
     position: absolute;
     top: 50%;
@@ -420,36 +227,7 @@ filter: brightness(1.15);
     z-index: 100;
     text-align: center;
 }
-
 .win-message.visible {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
-}
-/* --- СУПЕР-ФИКС ДЛЯ ВСЕХ ПОЛНОЭКРАННЫХ СТРАНИЦ --- */
-.hero-page, .fullscreen-page {
-    margin: 0 !important;
-    padding: 0 !important;
-    background: #000 !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    overflow: hidden !important;
-}
-
-.hero-wrapper, .fullscreen-wrapper {
-    position: relative !important;
-    width: 100% !important;
-    height: 100% !important;
-    max-width: calc(100vh * 1440 / 1024) !important;
-    max-height: 100vh !important;
-    aspect-ratio: 1440 / 1024 !important;
-}
-
-.hero-image, .fullscreen-image {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: fill !important;
-    display: block !important;
 }

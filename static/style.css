@@ -547,6 +547,26 @@ body.is-mobile .mobile-hud .hud-item strong {
     color: #55d66b;
     margin-top: 2px;
 }
+/* ===== ИСПРАВЛЕНИЕ КНОПОК НА ГЛАВНОЙ ДЛЯ ТЕЛЕФОНА ===== */
+body.is-mobile .hero-btn-1 { 
+    left: 6%; 
+    top: 56%; /* Подняли выше */
+    width: 28%; 
+    height: 18%; 
+}
 
+body.is-mobile .hero-btn-2 { 
+    left: 36%; 
+    top: 56%; 
+    width: 28%; 
+    height: 18%; 
+}
+
+body.is-mobile .hero-btn-3 { 
+    left: 66%; 
+    top: 56%; 
+    width: 28%; 
+    height: 18%; 
+}
 /* Прячем полосы прокрутки на мобильных */
 body.is-mobile::-webkit-scrollbar { display: none; }

@@ -15,14 +15,24 @@
             background: #111315;
             color: #eee;
         }
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(85, 214, 107, 0.2);
-            border-top-color: #55d66b;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
+                /* Сброс стандартных отступов браузера */
+        body {
+            margin: 0;
+            padding: 0;
+            background: #111315;
+            color: #eee;
+            font-family: Arial, sans-serif;
+        }
+
+        .search-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 100vw; /* Принудительно на всю ширину экрана */
+            overflow: hidden; /* Убираем любые полосы прокрутки */
+        }
         }
         @keyframes spin { 100% { transform: rotate(360deg); } }
         

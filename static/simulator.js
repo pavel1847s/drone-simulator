@@ -1,5 +1,5 @@
 // ===== НАСТРОЙКИ =====
-const DRONE_RADIUS = 2;     // Уменьшили радиус, чтобы дрон мог пролетать в узких местах
+const DRONE_RADIUS = 2;     // Маленький радиус, чтобы пролетал в узких щелях
 const DRONE_SPEED = 30;
 const WIN_DISTANCE = 4;
 
@@ -51,8 +51,8 @@ function pointFree(x, y) {
     if (x - m < 0 || x + m > 100) return false;
     if (y - m < 0 || y + m > 100) return false;
 
-    const PAD_X = 3;   // Отступ сбоку
-    const PAD_Y = 3;   // Отступ сверху/снизу
+    const PAD_X = 3;   
+    const PAD_Y = 3;   
 
     for (const h of houses) {
         if (x + m > h.x + PAD_X && x - m < h.x + h.w - PAD_X &&
@@ -63,8 +63,8 @@ function pointFree(x, y) {
 
 // ===== ПРОВЕРКА ПЕРЕСЕЧЕНИЯ ДОМОВ =====
 function isHouseOverlapping(x, y, w, h) {
-    // Уменьшили отступ до 1, чтобы дома стояли плотнее
-    const padding = 1; 
+    // Отрицательный отступ (-1.5) позволяет домам соединяться вплотную
+    const padding = -1.5; 
     
     for (const other of houses) {
         if (x < other.x + other.w + padding &&
@@ -95,7 +95,7 @@ function findTargetFarFrom(start) {
 
 // ===== ПРОВЕРКА ПУТИ (BFS) =====
 function checkPath(start, end) {
-    const step = 1.5; // Уменьшили шаг проверки для большей точности в узких местах
+    const step = 1.5; 
     const visited = new Set();
     const queue = [{ x: start.x, y: start.y }];
     visited.add(`${Math.floor(start.x/step)},${Math.floor(start.y/step)}`);
@@ -132,15 +132,14 @@ function checkPath(start, end) {
     return false;
 }
 
-// ===== ГЕНЕРАЦИЯ ДОМОВ =====
+// ===== ГЕНЕРАЦИЯ ДОМОВ (КЛАСТЕРАМИ) =====
 function generateHouses() {
     let attempts = 0;
     
-    while (attempts < 150) { // Увеличили попытки, чтобы найти плотную карту с проходом
+    while (attempts < 100) {
         attempts++;
         houses = [];
         
-        // Сетка стала плотнее: 7 колонок и 5 рядов
         const GRID_COLS = 7; 
         const GRID_ROWS = 5; 
         const CELL_W = 100 / GRID_COLS;
@@ -148,23 +147,39 @@ function generateHouses() {
         
         for (let r = 0; r < GRID_ROWS; r++) {
             for (let c = 0; c < GRID_COLS; c++) {
-                if (Math.random() > 0.85) continue; // 85% шанс появления дома (было 75%)
+                if (Math.random() > 0.8) continue; // 80% шанс, что тут будет застройка
 
-                // Дома стали чуть больше
-                const w = rand(10, 13); 
-                const h = rand(14, 17); 
+                const w = rand(9, 12); 
+                const h = rand(12, 15); 
 
-                let hx = c * CELL_W + (CELL_W - w) / 2;
-                let hy = r * CELL_H + (CELL_H - h) / 2;
-
-                hx += rand(-1.5, 1.5);
-                hy += rand(-2, 2);
-
-                hx = Math.max(2, Math.min(98 - w, hx));
-                hy = Math.max(2, Math.min(98 - h, hy));
+                let hx = c * CELL_W + (CELL_W - w) / 2 + rand(-1, 1);
+                let hy = r * CELL_H + (CELL_H - h) / 2 + rand(-1, 1);
 
                 if (!isHouseOverlapping(hx, hy, w, h)) {
                     houses.push({ x: hx, y: hy, w: w, h: h });
+
+                    // 60% шанс, что к этому дому пристроят соседний (соединятся)
+                    if (Math.random() < 0.6) {
+                        const dir = Math.floor(Math.random() * 4); // 0-вправо, 1-влево, 2-вниз, 3-вверх
+                        let dx = 0, dy = 0;
+                        
+                        if (dir === 0) dx = w - 1; // Справа
+                        if (dir === 1) dx = -w + 1; // Слева
+                        if (dir === 2) dy = h - 1; // Снизу
+                        if (dir === 3) dy = -h + 1; // Сверху
+
+                        const w2 = rand(8, 11);
+                        const h2 = rand(10, 14);
+                        const hx2 = hx + dx;
+                        const hy2 = hy + dy;
+
+                        // Проверяем границы и наложение
+                        if (hx2 > 0 && hx2 + w2 < 100 && hy2 > 0 && hy2 + h2 < 100) {
+                            if (!isHouseOverlapping(hx2, hy2, w2, h2)) {
+                                houses.push({ x: hx2, y: hy2, w: w2, h: h2 });
+                            }
+                        }
+                    }
                 }
             }
         }

@@ -480,22 +480,35 @@ button:hover { filter: brightness(1.15); }
     display: none; /* По умолчанию скрыта */
 }
 
+
 /* =======================================================
    МОБИЛЬНАЯ ВЕРСИЯ (Класс is-mobile добавляется через JS)
    ======================================================= */
 
+/* Мобильная версия картинок (главная и страницы "Дрон", "Управление") */
 body.is-mobile .hero-wrapper,
 body.is-mobile .fullscreen-wrapper {
     width: 100vw;
-    height: 100vh;
-    aspect-ratio: auto;
+    height: auto; /* Высота подстраивается под ширину */
+    aspect-ratio: 1440 / 1024; /* Сохраняем пропорции */
     max-width: 100vw;
     max-height: 100vh;
+    margin: auto; /* Центрируем по вертикали (черные полосы сверху и снизу) */
 }
 
 body.is-mobile .hero-image,
 body.is-mobile .fullscreen-image {
-    object-fit: contain; /* Вписываем картинку целиком на телефон */
+    width: 100%;
+    height: 100%;
+    object-fit: fill; /* Картинка заполняет контейнер ровно по пропорциям */
+}
+
+/* Кнопки входа (прижимаем к верху экрана) */
+body.is-mobile .auth-buttons {
+    top: 15px;
+    right: 15px;
+    transform: scale(0.85);
+    transform-origin: top right;
 }
 
 /* Скрываем шапку и панель в симуляторе на мобилке */
@@ -504,7 +517,7 @@ body.is-mobile .sim-page main { flex-direction: column; height: 100vh; width: 10
 body.is-mobile .sim-page aside { display: none; }
 body.is-mobile .sim-page .scene { width: 100vw; height: 100vh; }
 
-/* Показываем мобильную панель HUD */
+/* Показываем мобильную панель HUD в симуляторе */
 body.is-mobile .mobile-hud {
     display: flex;
     position: absolute;

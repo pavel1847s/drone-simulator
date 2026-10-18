@@ -81,12 +81,19 @@ function pointFree(x, y) {
     const m = DRONE_RADIUS;
     if (x - m < 0 || x + m > 100) return false;
     if (y - m < 0 || y + m > 100) return false;
+
+    // Отступы, чтобы дрон подлетал ближе к видимым стенам (игнорируем прозрачный фон PNG)
+    const PAD_X = 2.5; // отступ слева и справа
+    const PAD_Y = 3.5; // отступ сверху и снизу
+
     for (const h of houses) {
-        if (x + m > h.x && x - m < h.x + h.w &&
-            y + m > h.y && y - m < h.y + h.h) return false;
+        // Проверяем столкновение с уменьшенным хитбоксом
+        if (x + m > h.x + PAD_X && x - m < h.x + h.w - PAD_X &&
+            y + m > h.y + PAD_Y && y - m < h.y + h.h - PAD_Y) return false;
     }
     return true;
 }
+
 
 function findFreePoint() {
     for (let i = 0; i < 500; i++) {

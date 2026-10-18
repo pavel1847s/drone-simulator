@@ -331,8 +331,7 @@ function toggleFlight() {
 // ===== КЛАВИШИ =====
 document.addEventListener("keydown", e => {
     keys[e.code] = true;
-
-    if (e.code === "KeyR") resetToStart();
+    if (e.code === "KeyR") newGame();
     if (e.code === "Space") toggleFlight();
 
     if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"].includes(e.code)) {

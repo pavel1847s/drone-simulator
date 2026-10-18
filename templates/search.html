@@ -2,26 +2,16 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Поиск дрона</title>
     <link rel="stylesheet" href="/static/style.css">
     <style>
-        /* Стили для страницы поиска */
-        .search-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background: #111315;
-            color: #eee;
-        }
-                /* Сброс стандартных отступов браузера */
+        /* Жесткий сброс отступов для этой страницы */
         body {
             margin: 0;
             padding: 0;
+            overflow: hidden;
             background: #111315;
-            color: #eee;
-            font-family: Arial, sans-serif;
         }
 
         .search-container {
@@ -30,10 +20,28 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
-            width: 100vw; /* Принудительно на всю ширину экрана */
-            overflow: hidden; /* Убираем любые полосы прокрутки */
+            width: 100vw;
         }
+
+        /* Центрируем сам блок загрузки */
+        #loading-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
         }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(85, 214, 107, 0.2);
+            border-top-color: #55d66b;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
         @keyframes spin { 100% { transform: rotate(360deg); } }
         
         .result-card {
@@ -79,6 +87,20 @@
             font-weight: bold;
         }
         .btn:hover { filter: brightness(1.2); }
+
+        /* Статистика внизу слева */
+        .server-stats {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: #888;
+            font-size: 14px;
+            background: #181a1d;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid #303030;
+            font-family: Arial, sans-serif;
+        }
     </style>
 </head>
 <body>
@@ -87,7 +109,7 @@
     <!-- ЭКРАН ЗАГРУЗКИ -->
     <div id="loading-screen">
         <div class="spinner"></div>
-        <h2>Поиск заряженного дрона...</h2>
+        <h2 style="color: #eee; margin: 0;">Поиск заряженного дрона...</h2>
     </div>
 
     <!-- РЕЗУЛЬТАТ ПОИСКА -->
@@ -104,6 +126,13 @@
     </div>
 </div>
 
+<!-- Блок статистики -->
+<div class="server-stats" id="server-stats" style="display: none;">
+    📊 <b>Статистика сервера:</b> &nbsp; 
+    ✅ Успешных миссий: <span style="color: #55d66b;" id="stat-wins">0</span> &nbsp; | &nbsp; 
+    💥 Дронов потеряно: <span style="color: #d87528;" id="stat-losses">0</span>
+</div>
+
 <script>
     const loadingScreen = document.getElementById('loading-screen');
     const resultCard = document.getElementById('result-card');
@@ -113,7 +142,7 @@
 
     function startSearch() {
         // Показываем загрузку, скрываем результат
-        loadingScreen.style.display = 'block';
+        loadingScreen.style.display = 'flex';
         resultCard.style.display = 'none';
 
         // Ждем 5 секунд (5000 мс)
@@ -141,18 +170,16 @@
 
     // Запускаем поиск при загрузке страницы
     startSearch();
-</script>
-    <script>
+
     // Загружаем статистику с сервера
     fetch('/api/stats')
         .then(response => response.json())
         .then(data => {
-            // Создаем красивую плашку со статистикой
-            const statsDiv = document.createElement('div');
-            statsDiv.style.cssText = 'position: absolute; bottom: 20px; left: 20px; color: #888; font-size: 14px; background: #181a1d; padding: 10px 20px; border-radius: 8px; border: 1px solid #303030;';
-            statsDiv.innerHTML = `📊 <b>Статистика сервера:</b> &nbsp; ✅ Успешных миссий: <span style="color: #55d66b;">${data.wins}</span> &nbsp; | &nbsp; 💥 Дронов потеряно: <span style="color: #d87528;">${data.losses}</span>`;
-            document.body.appendChild(statsDiv);
-        });
+            document.getElementById('stat-wins').textContent = data.wins;
+            document.getElementById('stat-losses').textContent = data.losses;
+            document.getElementById('server-stats').style.display = 'block';
+        })
+        .catch(err => console.log("Ошибка загрузки статистики:", err));
 </script>
 </body>
 </html>

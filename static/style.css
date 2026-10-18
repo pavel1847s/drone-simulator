@@ -322,6 +322,7 @@ filter: brightness(1.15);
 .hero-btn-2 { left: 36%; top: 68%; width: 28%; height: 16%; }
 .hero-btn-3 { left: 66%; top: 68%; width: 28%; height: 16%; }
 /* ПОЛНОЭКРАННЫЕ СТРАНИЦЫ (device, tutorial) */
+/* ПОЛНОЭКРАННЫЕ СТРАНИЦЫ (device, tutorial) */
 .fullscreen-page {
     margin: 0;
     background: #000;

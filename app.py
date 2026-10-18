@@ -10,7 +10,7 @@ def init_db():
     c.execute('''CREATE TABLE IF NOT EXISTS game_stats
                  (id INTEGER PRIMARY KEY, wins INTEGER DEFAULT 0, losses INTEGER DEFAULT 0)''')
     # Создаем строку со статистикой, если ее еще нет
-    c.execute('INSERT OR IGNORE INTO stats (id, wins, losses) VALUES (1, 0, 0)')
+    c.execute('INSERT OR IGNORE INTO game_stats (id, wins, losses) VALUES (1, 0, 0)')
     conn.commit()
     conn.close()
 
@@ -42,7 +42,7 @@ def search():
 def get_stats():
     conn = sqlite3.connect('stats.db')
     c = conn.cursor()
-    c.execute('SELECT wins, losses FROM stats WHERE id=1')
+    c.execute('SELECT wins, losses FROM game_stats WHERE id=1')
     result = c.fetchone()
     conn.close()
     return jsonify({'wins': result[0], 'losses': result[1]})
@@ -55,9 +55,9 @@ def update_stats():
     conn = sqlite3.connect('stats.db')
     c = conn.cursor()
     if result_type == 'win':
-        c.execute('UPDATE stats SET wins = wins + 1 WHERE id=1')
+        c.execute('UPDATE game_stats SET wins = wins + 1 WHERE id=1')
     elif result_type == 'loss':
-        c.execute('UPDATE stats SET losses = losses + 1 WHERE id=1')
+        c.execute('UPDATE game_stats SET losses = losses + 1 WHERE id=1')
     conn.commit()
     conn.close()
     return jsonify({'status': 'success'})

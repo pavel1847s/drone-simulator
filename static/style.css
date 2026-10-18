@@ -312,3 +312,43 @@ button:hover {
     from { transform: translate(-50%, -50%) rotate(45deg) scale(1); }
     to { transform: translate(-50%, -50%) rotate(45deg) scale(1.2); }
 }
+/* ===== СТИЛИ ДЛЯ ПАНЕЛИ СИМУЛЯТОРА ===== */
+
+/* Зеленая плашка (Дрон и Заряд) */
+.param-green {
+    background: rgba(85, 214, 107, 0.05) !important;
+    border: 1px solid rgba(85, 214, 107, 0.2) !important;
+    box-shadow: 0 0 10px rgba(85, 214, 107, 0.1) inset !important;
+    border-radius: 6px;
+    margin-bottom: 5px;
+}
+.param-green strong {
+    color: #7df092; /* Мягкий салатовый вместо ядовито-зеленого */
+    text-shadow: 0 0 5px rgba(85, 214, 107, 0.4);
+}
+
+/* Красная плашка (Таймер) */
+.param-red {
+    background: rgba(255, 85, 85, 0.05) !important;
+    border: 1px solid rgba(255, 85, 85, 0.2) !important;
+    box-shadow: 0 0 10px rgba(255, 85, 85, 0.1) inset !important;
+    border-radius: 6px;
+    margin-bottom: 5px;
+}
+.param-red strong {
+    color: #ff9999; /* Мягкий розово-красный */
+    text-shadow: 0 0 5px rgba(255, 85, 85, 0.4);
+}
+
+/* Оранжевая плашка (Грузы) */
+.param-orange {
+    background: rgba(216, 117, 40, 0.05) !important;
+    border: 1px solid rgba(216, 117, 40, 0.2) !important;
+    box-shadow: 0 0 10px rgba(216, 117, 40, 0.1) inset !important;
+    border-radius: 6px;
+    margin-bottom: 5px;
+}
+.param-orange strong {
+    color: #f0a56e; /* Мягкий персиковый */
+    text-shadow: 0 0 5px rgba(216, 117, 40, 0.4);
+}

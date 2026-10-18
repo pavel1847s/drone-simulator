@@ -2,7 +2,7 @@
 const DRONE_RADIUS = 2;     
 const DRONE_SPEED = 30;
 const WIN_DISTANCE = 4;
-const TOTAL_CARGOS = 3; // Сколько грузов нужно собрать
+const TOTAL_CARGOS = 3; 
 
 const city = document.getElementById("city");
 const drone = document.getElementById("drone");
@@ -13,7 +13,9 @@ const distanceEl = document.getElementById("distance");
 const statusEl = document.getElementById("flight-status");
 const restartBtn = document.getElementById("restart-button");
 const explosionOverlay = document.getElementById("explosion-overlay");
+const explosionText = document.getElementById("explosion-text");
 const cargoDisplay = document.getElementById("cargo-display");
+const timerDisplay = document.getElementById("timer-display");
 
 const urlParams = new URLSearchParams(window.location.search);
 const droneSerial = urlParams.get('serial') || '12345';
@@ -46,6 +48,10 @@ let startPos = { x: 0, y: 0 };
 let flying = false;
 let won = false;
 const keys = {};
+
+// Переменные таймера
+let timeLeft = 60;
+let timerInterval = null;
 
 const rand = (a, b) => a + Math.random() * (b - a);
 
@@ -151,18 +157,15 @@ function generateMap() {
             }
         }
         
-        // ВАЖНО: сначала находим старт и финиш
         dronePos = findFreePoint();
-        startPos = { x: dronePos.x, y: dronePos.y }; // Запоминаем точку А
+        startPos = { x: dronePos.x, y: dronePos.y }; 
         targetPos = findTargetFarFrom(dronePos);
         
-        // Спавним грузы в случайных свободных местах
         cargos = [];
         let cargoTries = 0;
         while (cargos.length < TOTAL_CARGOS && cargoTries < 100) {
             cargoTries++;
             const p = findFreePoint();
-            // Груз не должен быть слишком близко к старту или финишу (используем startPos корректно)
             if (Math.hypot(p.x - startPos.x, p.y - startPos.y) > 15 && Math.hypot(p.x - targetPos.x, p.y - targetPos.y) > 15) {
                 cargos.push({ x: p.x, y: p.y, collected: false });
             }
@@ -186,7 +189,6 @@ function renderHouses() {
     }
 }
 
-// ===== ОТРИСОВКА ГРУЗОВ =====
 function renderCargos() {
     city.querySelectorAll(".cargo").forEach(el => el.remove());
     for (const c of cargos) {
@@ -215,7 +217,7 @@ function update(dt) {
     const ny = dronePos.y + dy * step;
 
     if (!pointFree(nx, ny)) {
-        triggerExplosion();
+        triggerExplosion("ДРОН БЫЛ ВЗОРВАН!");
         return;
     }
     
@@ -223,8 +225,7 @@ function update(dt) {
     dronePos.y = ny;
     updateDroneImage(dx, dy);
     updateDronePosition();
-    
-    checkWin(); // <--- ВОТ ЭТА СТРОКА БЫЛА УДАЛЕНА, ТЕПЕРЬ ОНА НА МЕСТЕ
+    checkWin(); 
 }
 
 function updateDroneImage(dx, dy) {
@@ -238,17 +239,16 @@ function updateDronePosition() {
     distanceEl.textContent = d.toFixed(1) + " %";
 }
 
-// ===== СБОР ГРУЗА (Клавиша E) =====
 function tryCollectCargo() {
     if (won || !flying) return;
     for (let i = 0; i < cargos.length; i++) {
         if (cargos[i].collected) continue;
         const dist = Math.hypot(dronePos.x - cargos[i].x, dronePos.y - cargos[i].y);
-        if (dist < 5) { // Если дрон подлетел близко
+        if (dist < 5) { 
             cargos[i].collected = true;
             collectedCargos++;
             cargoDisplay.textContent = `${collectedCargos} / ${TOTAL_CARGOS}`;
-            renderCargos(); // Перерисовываем, чтобы исчез
+            renderCargos(); 
             
             if (collectedCargos === TOTAL_CARGOS) {
                 statusEl.textContent = "ВСЕ ГРУЗЫ СОБРАНЫ! ЛЕТИМ В Б!";
@@ -271,6 +271,7 @@ function checkWin() {
         }
         won = true;
         flying = false;
+        if (timerInterval) clearInterval(timerInterval); // Стоп таймер
         statusEl.textContent = "ЦЕЛЬ ДОСТИГНУТА";
         statusEl.style.color = "#55d66b";
         winMessage.classList.add("visible");
@@ -278,12 +279,37 @@ function checkWin() {
     }
 }
 
-function triggerExplosion() {
+function triggerExplosion(msg = "ДРОН БЫЛ ВЗОРВАН!") {
     won = true; flying = false;
+    if (timerInterval) clearInterval(timerInterval); // Стоп таймер
     statusEl.textContent = "УНИЧТОЖЕН";
     statusEl.style.color = "#ff0000";
-    if (explosionOverlay) explosionOverlay.classList.add("visible");
+    if (explosionOverlay) {
+        explosionText.textContent = msg;
+        explosionOverlay.classList.add("visible");
+    }
     sendStats('loss'); 
+}
+
+// ===== ТАЙМЕР =====
+function startTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+    timeLeft = 60;
+    timerDisplay.textContent = "01:00";
+    
+    timerInterval = setInterval(() => {
+        if (won || !flying) return; // Если игра окончена, таймер стоит
+        
+        timeLeft--;
+        const min = Math.floor(timeLeft / 60);
+        const sec = timeLeft % 60;
+        timerDisplay.textContent = `0${min}:${sec < 10 ? '0' : ''}${sec}`;
+        
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            triggerExplosion("ВРЕМЯ ВЫШЛО!");
+        }
+    }, 1000);
 }
 
 // ===== ФУНКЦИЯ ОТПРАВКИ ДАННЫХ =====
@@ -298,6 +324,10 @@ function sendStats(result) {
 // ===== НОВАЯ ИГРА =====
 function newGame() {
     won = false; flying = false;
+    if (timerInterval) clearInterval(timerInterval);
+    timeLeft = 60;
+    timerDisplay.textContent = "01:00";
+    
     winMessage.classList.remove("visible");
     if (explosionOverlay) explosionOverlay.classList.remove("visible");
     statusEl.textContent = "НА ЗЕМЛЕ";
@@ -320,26 +350,17 @@ function newGame() {
     drone.style.transform = "translate(-50%, -50%) scale(0.85)";
 }
 
-function resetToStart() {
-    if (won || flying) {
-        won = false; flying = false;
-        if (explosionOverlay) explosionOverlay.classList.remove("visible");
-        winMessage.classList.remove("visible");
-        statusEl.textContent = "НА ЗЕМЛЕ";
-        statusEl.style.color = "#eee";
-        dronePos = { x: startPos.x, y: startPos.y };
-        updateDronePosition();
-        drone.src = droneImages.back;
-        drone.style.transform = "translate(-50%, -50%) scale(0.85)";
-    }
-}
-
 function toggleFlight() {
     if (won) return;
     flying = !flying;
     statusEl.textContent = flying ? "В ПОЛЁТЕ" : "НА ЗЕМЛЕ";
     statusEl.style.color = "#eee";
     drone.style.transform = flying ? "translate(-50%, -50%) scale(1)" : "translate(-50%, -50%) scale(0.85)";
+    
+    // Запуск таймера только при взлете
+    if (flying && timeLeft === 60) {
+        startTimer();
+    }
 }
 
 // ===== ОБРАБОТКА КЛАВИШ =====
@@ -368,3 +389,4 @@ function loop(t) {
 
 newGame();
 requestAnimationFrame(loop);
+

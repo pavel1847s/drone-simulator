@@ -22,4 +22,4 @@ if __name__ == "__main__":
     app.run(debug=True)
 @app.route("/search")
 def search():
-    return render_template("search.html")м
+    return render_template("search.html")
